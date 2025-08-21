@@ -1,0 +1,572 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:linksfam98765@linksfam.c1ei8y6y2d92.ap-south-1.rds.amazonaws.com:5432/linksfam?sslmode=require"
+}
+
+model User {
+  id                      Int                       @id @default(autoincrement())
+  email                   String?                   @unique
+  phone                   String?                   @unique
+  otp                     String
+  isActive                Boolean                   @default(false)
+  type                    TYPE                      @default(INFLUENCER)
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  referralCode            String?                   @unique @default(uuid())
+  referredBy              String?
+  company                 Company[]
+  influencer              Influencer[]
+  influencerSocialDetails InfluencerSocialDetails[]
+  profile                 Profile[]
+  referralBonus           ReferralBonus[]
+  userPhyllo              UserPhyllo[]
+}
+
+model ReferralBonus {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  reward    Int      @default(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model UserPhyllo {
+  id        Int    @id @default(autoincrement())
+  phyllo_id String
+  userId    Int
+  user      User   @relation(fields: [userId], references: [id])
+}
+
+model Company {
+  id                        Int                         @id @default(autoincrement())
+  name                      String?
+  url                       String?
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+  userId                    Int
+  areaOfSpecialty           String?
+  country                   String?
+  desgOfPerson              String?
+  fb                        String?
+  git                       String?
+  gst                       String?
+  instagram                 String?
+  latlng                    String?
+  linkedin                  String?
+  nameOfPerson              String?
+  phoneOfPerson             String?
+  pin                       String?
+  snap                      String?
+  tiktok                    String?
+  twitch                    String?
+  x                         String?
+  yt                        String?
+  stepTwo                   Boolean?                    @default(false)
+  user                      User                        @relation(fields: [userId], references: [id])
+  companyBankInfo           CompanyBankInfo[]
+  companyInvoice            CompanyInvoice[]
+  companyLedger             CompanyLedger[]
+  companyWallet             CompanyWallet[]
+  link                      Link[]
+  pixelHit                  PixelHit[]
+  requestRefund             RequestRefund[]
+  trackTemporaryTransaction TrackTemporaryTransaction[]
+}
+
+model Category {
+  id         Int          @id @default(autoincrement())
+  name       String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  brands     Brands[]
+  influencer Influencer[]
+  link       Link[]
+}
+
+model Link {
+  id                 Int          @id @default(autoincrement())
+  link               String
+  isActive           Boolean      @default(true)
+  fee                Decimal      @default(0.00)
+  currency           String       @default("INR")
+  categoryId         Int
+  companyId          Int?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  type               String?
+  input_type         String?
+  brandId            Int?
+  isExploreBrandlink Boolean?     @default(false)
+  brand              Brands?      @relation(fields: [brandId], references: [id])
+  category           Category     @relation(fields: [categoryId], references: [id])
+  company            Company?     @relation(fields: [companyId], references: [id])
+  shortLinks         ShortLinks[]
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  location  String?
+  pic       String?
+  userId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+}
+
+model InfluencerSocialAccount {
+  id                          Int        @id @default(autoincrement())
+  instagram_phyllo_account_id String?
+  youtube_phyllo_account_id   String?
+  facebook_phyllo_account_id  String?
+  x_phyllo_account_id         String?
+  createdAt                   DateTime   @default(now())
+  updatedAt                   DateTime   @updatedAt
+  influencerId                Int
+  facebook                    String?
+  instagram                   String?
+  x                           String?
+  youtube                     String?
+  influencer                  Influencer @relation(fields: [influencerId], references: [id])
+}
+
+model Influencer {
+  id                      Int                       @id @default(autoincrement())
+  userId                  Int
+  categoryId              Int
+  name                    String?
+  createdAt               DateTime                  @default(now())
+  updatedAt               DateTime                  @updatedAt
+  whatsapp                String?                    //whatsapp number of influencer to be displayed in the profile
+  email                   String?                    //email of influencer to be displayed in the profile
+  ig_url                  String?      
+  yt_url                  String?                    
+  amazon_tag              String?
+  is_insta_eligible       Boolean                   @default(false)
+  is_yt_eligible          Boolean                   @default(false)
+  city                    String?
+  category                Category                  @relation(fields: [categoryId], references: [id])
+  user                    User                      @relation(fields: [userId], references: [id])
+  influencerBankInfo      InfluencerBankInfo[]
+  influencerInvoice       InfluencerInvoice[]
+  influencerLedger        InfluencerLedger[]
+  influencerSocialAccount InfluencerSocialAccount[]
+  influencerWallet        InfluencerWallet[]
+  miscShortLinks          MiscShortLinks[]
+  pixelHit                PixelHit[]
+  shopPosts               ShopPost[]
+  shortLinks              ShortLinks[]
+  products                Products[]
+  rateCard                RateCard?
+}
+
+model InfluencerSocialDetails {
+  id                   Int                    @id @default(autoincrement())
+  socialMediaType      String
+  token                String
+  name                 String?
+  email                String?
+  provider             String?
+  createdAt            DateTime               @default(now())
+  updatedAt            DateTime               @updatedAt
+  userId               Int
+  isActive             Boolean                @default(true)
+  biography            String?
+  followers_count      Int?
+  follows_count        Int?
+  media_count          Int?
+  profile_picture_url  String?
+  stories              Int?
+  username             String?
+  website              String?
+  refresh_token        String?
+  expires_at           DateTime?
+  user                 User                   @relation(fields: [userId], references: [id])
+  newestInstagramReels NewestInstagramReels[]
+  newestYoutubeVideos  NewestYoutubeVideos[] 
+
+  @@unique([userId, socialMediaType])
+}
+
+model ShortLinks {
+  id           Int        @id @default(autoincrement())
+  linkId       Int
+  influencerId Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  deviceInfo   Json?
+  shLinkCode   String
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+  link         Link       @relation(fields: [linkId], references: [id])
+}
+
+model CompanyLedger {
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  dateScheduled DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  amountSpent   Decimal? @default(0.00)
+  company       Company  @relation(fields: [companyId], references: [id])
+}
+
+model CompanyInvoice {
+  id              Int        @id @default(autoincrement())
+  companyId       Int
+  start           DateTime   @default(now())
+  end             DateTime   @updatedAt
+  createdAt       DateTime   @default(now())
+  updatedAt       DateTime   @updatedAt
+  creditInfo      Json?
+  invoiceAmount   Decimal?   @default(0.00)
+  invoiceSerialNo String?
+  transType       TRANS_TYPE @default(CREDIT)
+  company         Company    @relation(fields: [companyId], references: [id])
+}
+
+model CompanyWallet {
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  walletBalance Decimal? @default(0.00)
+  company       Company  @relation(fields: [companyId], references: [id])
+}
+
+model CompanyBankInfo {
+  id            Int      @id @default(autoincrement())
+  companyId     Int
+  gst           String?
+  accountNumber String?
+  ifsc          String?
+  name          String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  company       Company  @relation(fields: [companyId], references: [id])
+}
+
+model InfluencerWallet {
+  id            Int        @id @default(autoincrement())
+  influencerId  Int
+  walletBalance Decimal?   @default(0.00)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  influencer    Influencer @relation(fields: [influencerId], references: [id])
+}
+
+model InfluencerLedger {
+  id             Int        @id @default(autoincrement())
+  influencerId   Int
+  dateScheduled  DateTime   @default(now())
+  amountRecieved Decimal?   @default(0.00)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  influencer     Influencer @relation(fields: [influencerId], references: [id])
+}
+
+model InfluencerInvoice {
+  id              Int                   @id @default(autoincrement())
+  influencerId    Int
+  start           DateTime              @default(now())
+  end             DateTime              @updatedAt
+  invoiceSerialNo String?
+  invoiceAmount   Decimal?              @default(0.00)
+  transType       INFLUENCER_TRANS_TYPE @default(EARNING)
+  creditInfo      Json?
+  createdAt       DateTime              @default(now())
+  updatedAt       DateTime              @updatedAt
+  influencer      Influencer            @relation(fields: [influencerId], references: [id])
+}
+
+model InfluencerBankInfo {
+  id            Int        @id @default(autoincrement())
+  influencerId  Int
+  upi           String?
+  accountNumber String?
+  ifsc          String?
+  name          String?
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  influencer    Influencer @relation(fields: [influencerId], references: [id])
+}
+
+model RequestRefund {
+  id          Int      @id @default(autoincrement())
+  reason      String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  companyId   Int
+  isCompleted Boolean  @default(false)
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+model AdminUser {
+  id        Int      @id @default(autoincrement())
+  email     String?  @unique
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Source {
+  id          Int      @id @default(autoincrement())
+  source_name String?
+  source_url  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model PaymentStrategy {
+  id            Int      @id @default(autoincrement())
+  strategy_name String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Brands {
+  id           Int       @id @default(autoincrement())
+  brand_name   String?
+  brand_email  String?
+  brand_url    String?
+  person_name  String?
+  person_email String?
+  person_phone String?
+  emp_count    Int?
+  max_spend    Decimal?  @default(0.00)
+  min_spend    Decimal?  @default(0.00)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  campaignId   String?
+  image_url    String?
+  categoryId   Int?
+  category     Category? @relation(fields: [categoryId], references: [id])
+  link         Link[]
+}
+
+model Advertistment {
+  id                  Int      @id @default(autoincrement())
+  source              String?
+  brand               String?
+  category            String?
+  keyword             String?
+  url                 String?
+  email_creds         String?
+  username_creds      String?
+  password_creds      String?
+  affiliate_page_link String?
+  payment_strategy    String?
+  product_link        String?
+  note                String?
+  status              String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  fee                 Decimal? @default(0.00)
+}
+
+model Creators {
+  id        Int       @id @default(autoincrement())
+  URL       String?
+  Name      String?
+  Type      String?
+  Platforms String?
+  createdAt DateTime? @default(now())
+  updatedAt DateTime? @updatedAt
+}
+
+model TrackTemporaryTransaction {
+  id          Int      @id @default(autoincrement())
+  transId     String?
+  amount      Decimal? @default(0.00)
+  companyId   Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  isCompleted Boolean  @default(false)
+  company     Company  @relation(fields: [companyId], references: [id])
+}
+
+model Affiliate {
+  id               Int      @id @default(autoincrement())
+  params           String?
+  influencerParams String?
+  fixedParams      String?
+  affiliateLink    String?
+  name             String?
+  note             String?
+  type             String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model PartnerBrand {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  slug                String
+  category            String
+  heroMediaUrl        String
+  heroTitle           String
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  logoUrl             String
+  miscShortLinks      MiscShortLinks[]
+  partnerBrandProduct PartnerBrandProduct[]
+}
+
+model PartnerBrandProduct {
+  id                 Int          @id @default(autoincrement())
+  productName        String
+  productDescription String
+  price              Decimal      @default(0.00)
+  discount           Decimal      @default(0.00)
+  heroTitle          String
+  size               String?
+  otherInfo          String?
+  redirectUrl        String
+  productImage       String[]
+  partnerBrandId     Int
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+  partnerBrand       PartnerBrand @relation(fields: [partnerBrandId], references: [id])
+}
+
+model AmazonConversion {
+  id           Int      @id @default(autoincrement())
+  fees         String
+  clicks       String
+  itemsOrdered String
+  itemsShipped String
+  revenue      String
+  trackingId   String
+  name         String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  ig_url       String?
+}
+
+model MiscShortLinks {
+  id           Int          @id @default(autoincrement())
+  influencerId Int
+  shLinkCode   String
+  partnerId    Int
+  otherInfo    String?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  bulkLink     String?
+  influencer   Influencer   @relation(fields: [influencerId], references: [id])
+  partner      PartnerBrand @relation(fields: [partnerId], references: [id])
+}
+
+model PixelHit {
+  id           Int         @id @default(autoincrement())
+  companyId    Int
+  influencerId Int?
+  event        String      @default("signup")
+  value        Float?      @default(0)
+  ip           String
+  ua           String
+  createdAt    DateTime    @default(now())
+  company      Company     @relation(fields: [companyId], references: [id])
+  influencer   Influencer? @relation(fields: [influencerId], references: [id])
+}
+
+model NewestYoutubeVideos {
+  id            Int                     @id @default(autoincrement())
+  videoId       String
+  title         String
+  description   String
+  thumbnailUrl  String
+  videoUrl      String
+  publishedDate DateTime
+  likes         Int?
+  comments      Int?
+  viewCount     Int?
+  socialId      Int
+  social        InfluencerSocialDetails @relation(fields: [socialId], references: [id], onDelete: Cascade)
+}
+
+model NewestInstagramReels {
+  id             Int                     @id @default(autoincrement())
+  caption        String?
+  permalink      String?
+  timestamp      DateTime
+  socialId       Int
+  comments_count Int?
+  like_count     Int?
+  media_url      String
+  thumbnail_url  String?
+  media_type     String?
+  postId         String
+  social         InfluencerSocialDetails @relation(fields: [socialId], references: [id], onDelete: Cascade)
+}
+
+model ShopPost {
+  id           Int        @id @default(autoincrement())
+  title        String
+  description  String?
+  mediaUrl     String
+  thumbnailUrl String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  influencerId Int
+  productUrls  String[]
+  igPostId     String?
+  mediaExpiry  DateTime?
+  influencer   Influencer @relation(fields: [influencerId], references: [id])
+}
+
+model Products {
+  id                 Int        @id @default(autoincrement())
+  productUrl         String
+  productName        String?
+  imageUrl           String?
+  productDescription String?
+  sitename           String?
+  price              Decimal?
+  influencerId       Int
+  influencer         Influencer @relation(fields: [influencerId], references: [id])
+  createdAt          DateTime   @default(now())
+  updatedAt          DateTime   @updatedAt
+} 
+
+model RateCard {
+  id                              Int        @id @default(autoincrement())
+  // Instagram Pricing
+  reelCharge                      Decimal?
+  storyCharge                     Decimal?
+  carouselPostCharge              Decimal?
+  linkInBioCharge                 Decimal?
+  instagramComboPackage           Decimal?
+  // YouTube Pricing
+  youtubeShortCharge              Decimal?
+  youtubeIntegrationCharge        Decimal?
+  youtubeDedicatedVideoCharge     Decimal?
+  // Other Offers
+  customComboPackage              String?
+  // Notes
+  minimumCollaborationValue       Decimal?
+  availableForBarterDeals         Boolean?   @default(false)
+  // Metadata
+  influencerId                    Int        @unique
+  createdAt                       DateTime   @default(now())
+  updatedAt                       DateTime   @updatedAt
+  influencer                      Influencer @relation(fields: [influencerId], references: [id])
+}
+
+enum TYPE {
+  ADMIN
+  COMPANY
+  INFLUENCER
+}
+
+enum TRANS_TYPE {
+  CREDIT
+  DEBIT
+}
+
+enum INFLUENCER_TRANS_TYPE {
+  EARNING
+  REDEEM
+}

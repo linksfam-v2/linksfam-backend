@@ -1,0 +1,21 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "LinksFam API",
+        "version": "1.0.0",
+        "description": "LinksFam API"
+    },
+    "paths": {
+        "/health": {
+            "get": {
+                "summary": "Health check endpoint",
+                "description": "Returns a status message to indicate the server is healthy.",
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                }
+            }
+        }
+    }
+}
